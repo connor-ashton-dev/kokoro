@@ -3,33 +3,25 @@
 ########################
 # 1️⃣  Base image
 ########################
-# • The runpod/pytorch images already include CUDA, cuDNN, NCCL and PyTorch
-#   built with GPU support – exactly what Serverless needs. :contentReference[oaicite:0]{index=0}
-# • Pick the smallest *runtime* flavour that still has Python.
-ARG PY_VERSION=3.11
-ARG TORCH_VERSION=2.2.2
-FROM runpod/pytorch:${TORCH_VERSION}-py${PY_VERSION}-cu121-runtime-ubuntu22.04 AS runtime
+FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04 AS runtime
 
 ########################
-# 2️⃣  Env + OS deps
+# 2️⃣  Env & OS deps
 ########################
-ENV DEBIAN_FRONTEND=noninteractive \
-    PYTHONUNBUFFERED=1 \
+ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_PREFER_BINARY=1
 
-# only the libs Kokoro really needs
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libsndfile1 ffmpeg && \
+    apt-get install -y --no-install-recommends ffmpeg && \
     rm -rf /var/lib/apt/lists/*
 
 ########################
 # 3️⃣  Python deps
 ########################
-# Pin versions for repeatability; copy in early for layer-cache wins.
-COPY requirements.txt /tmp/requirements.txt
-RUN python -m pip install --upgrade pip && \
-    pip install -r /tmp/requirements.txt
+COPY pyproject.toml uv.lock /tmp/
+RUN python -m pip install --upgrade pip uv && \
+    uv pip install --system --frozen --no-cache -p /usr/bin/python3.11 --requirement /tmp/pyproject.toml
 
 ########################
 # 4️⃣  App code
