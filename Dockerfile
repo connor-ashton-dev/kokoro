@@ -21,7 +21,9 @@ RUN apt-get update && \
 ########################
 COPY pyproject.toml uv.lock /tmp/
 RUN python -m pip install --upgrade pip uv && \
-    uv pip install --system --frozen --no-cache -p /usr/bin/python3.11 --requirement /tmp/pyproject.toml
+    cd /tmp && \
+    uv pip install --system --frozen --no-cache && \
+    cd /workspace
 
 ########################
 # 4️⃣  App code
