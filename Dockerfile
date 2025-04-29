@@ -19,11 +19,9 @@ RUN apt-get update && \
 ########################
 # 3️⃣  Python deps
 ########################
-COPY pyproject.toml uv.lock /tmp/
-RUN python -m pip install --upgrade pip uv && \
-    cd /tmp && \
-    uv pip install --system --frozen --no-cache && \
-    cd /workspace
+COPY requirements.txt /tmp/requirements.txt
+RUN python -m pip install --upgrade pip && \
+    pip install -r /tmp/requirements.txt
 
 ########################
 # 4️⃣  App code
