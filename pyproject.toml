@@ -1,0 +1,13 @@
+[project]
+name = "kokoro-runpod"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "ipython>=9.2.0",
+    "kokoro>=0.9.4",
+    "pip>=25.1",
+    "runpod>=1.7.9",
+    "soundfile>=0.13.1",
+]
